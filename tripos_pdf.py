@@ -74,6 +74,9 @@ def main():
                         " e.g. 2P3_2003 2P4_2014:5,7-9")
     parser.add_argument("-o", "--output", default="output.pdf",
                         type=str, help="File name for the combined pdf")
+    parser.add_argument("-w", "--watermark", action="store_true",
+                        help="If set, will watermark each file with "
+                        "the paper name and year in the top left corner")
 
     args = parser.parse_args()
 
@@ -92,9 +95,10 @@ def main():
 
         page_len = output_pdf.get_num_pages()
 
-        watermark_page = get_text_pdf(f"{paper} {year}")
-        for page_no in range(prev_len, page_len):
-            output_pdf.get_page(page_no).merge_page(watermark_page)
+        if args.watermark:
+            watermark_page = get_text_pdf(f"{paper} {year}")
+            for page_no in range(prev_len, page_len):
+                output_pdf.get_page(page_no).merge_page(watermark_page)
 
         prev_len = page_len
 
