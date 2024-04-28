@@ -1,0 +1,16 @@
+[project]
+name = "tripos_pdf"
+version = "1.0.0"
+description = "Tool for downloading and combining CUED Tripos papers"
+dependencies = [
+    "pypdf",
+    "reportlab",
+    "requests",
+]
+
+[project.scripts]
+tripos-pdf = "tripos_pdf:main"
+
+[build-system]
+requires = ["setuptools>=45"]
+build-backend = 'setuptools.build_meta'
