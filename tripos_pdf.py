@@ -18,16 +18,15 @@ def parse_question_paper(paper_input: str):
     if ":" in paper_input:
         paper_year, page_selections = paper_input.split(":")
 
-        page_set: set[int] = set()
+        pages: list[int] = list()
         for page_selection in page_selections.split(","):
-            if "-" in page_selection:
+            if "-" in page_selection:  # "3-5"
                 first_page, last_page = page_selection.split("-")
-                page_set.update(range(int(first_page), int(last_page) + 1))
-            else:
-                page_set.add(int(page_selection))
-
-        # Zero-indexed page numbers
-        pages = [page - 1 for page in page_set]
+                # Zero-indexed page numbers
+                pages.extend(range(int(first_page) - 1, int(last_page)))
+            else:  # "3"
+                # Zero-indexed page numbers
+                pages.append(int(page_selection) - 1)
 
     else:
         paper_year = paper_input
