@@ -26,6 +26,9 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install .
         pip install -r requirements-dev.txt
+    - name: Lint with flake8
+      run: |
+        flake8 . --max-line-length=120
     - name: Type check with mypy
       run: |
         mypy -p tripos_pdf --install-types --non-interactive
