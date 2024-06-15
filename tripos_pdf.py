@@ -9,11 +9,13 @@ import pypdf
 import requests
 
 
-def parse_question_paper(paper_input: str):
+def parse_question_paper(paper_input: str) -> tuple[str, int, list[int] | None]:
+    pages: list[int] | None = None
+
     if ":" in paper_input:
         paper_year, page_selections = paper_input.split(":")
 
-        pages: list[int] = list()
+        pages = list()
         for page_selection in page_selections.split(","):
             if "-" in page_selection:  # "3-5"
                 first_page, last_page = page_selection.split("-")
@@ -25,7 +27,6 @@ def parse_question_paper(paper_input: str):
 
     else:
         paper_year = paper_input
-        pages = None
 
     paper, year = paper_year.split("_")
     return paper, int(year), pages
@@ -36,17 +37,16 @@ def get_download_url(paper: str, year: int) -> str:
 
 
 def handle_reponse_error(response: requests.Response) -> t.NoReturn:
-    # content_str = str(response.content)
-    if bytes("DEPLOYMENT_NOT_FOUND", "utf-8") in response.content:
-        raise ConnectionError(f"Could not find CamCribs: {response.content}")
-    elif bytes("NOT_FOUND", "utf-8") in response.content:
-        raise ValueError(f"File not found at {response.url}: {response.content}")
+    if b"DEPLOYMENT_NOT_FOUND" in response.content:
+        raise ConnectionError(f"Could not find CamCribs: {response.content.decode()}")
+    elif b"NOT_FOUND" in response.content:
+        raise ValueError(f"File not found at {response.url}: {response.content.decode()}")
     else:
         raise requests.RequestException(f"Unknown request error - code {response.status_code}"
-                                        f" from {response.url}: {response.content}")
+                                        f" from {response.url}: {response.content.decode()}")
 
 
-def get_file(url: str):
+def get_file(url: str) -> pypdf.PdfReader:
     response = requests.get(url)
 
     if not response.ok:
@@ -56,7 +56,7 @@ def get_file(url: str):
     return pypdf.PdfReader(pdf_bytes_reader)
 
 
-def get_text_pdf(text: str):
+def get_text_pdf(text: str) -> pypdf.PageObject:
     packet = io.BytesIO()
     can = canvas.Canvas(packet, pagesize=pagesizes.A4)
     width, height = pagesizes.A4
@@ -70,7 +70,7 @@ def get_text_pdf(text: str):
     return pypdf.PdfReader(packet).get_page(0)
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("question_papers", nargs="+", type=str,
                         help="Question papers in form <paper>_<year> with optional page number selections."
