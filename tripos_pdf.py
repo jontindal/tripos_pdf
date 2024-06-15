@@ -48,7 +48,6 @@ def handle_reponse_error(response: requests.Response) -> t.NoReturn:
 
 def get_file(url: str) -> pypdf.PdfReader:
     response = requests.get(url)
-    print(f"{response.status_code = } {response.content = }")
 
     if not response.ok:
         handle_reponse_error(response)
