@@ -1,17 +1,12 @@
 import argparse
 import concurrent.futures
 import io
+import typing as t
 
 from reportlab.pdfgen import canvas
 from reportlab.lib import pagesizes
 import pypdf
 import requests
-
-
-VALID_PAPERS = {f"2P{no}" for no in range(1, 9)}
-
-VALID_YEARS = set(range(1996, 2024))
-VALID_YEARS.remove(2020)
 
 
 def parse_question_paper(paper_input: str):
@@ -37,17 +32,26 @@ def parse_question_paper(paper_input: str):
 
 
 def get_download_url(paper: str, year: int) -> str:
-    if paper not in VALID_PAPERS:
-        raise ValueError(f"Invalid paper: {paper}, must be one of {VALID_PAPERS}")
-
-    if year not in VALID_YEARS:
-        raise ValueError(f"Invalid year: {year}, must be one of {VALID_YEARS}")
-
     return f"https://cribs-static.vercel.app/IB/tripos/{paper}/QP_{year}.pdf"
+
+
+def handle_reponse_error(response: requests.Response) -> t.NoReturn:
+    # content_str = str(response.content)
+    if bytes("DEPLOYMENT_NOT_FOUND", "utf-8") in response.content:
+        raise ConnectionError(f"Could not find CamCribs: {response.content}")
+    elif bytes("NOT_FOUND", "utf-8") in response.content:
+        raise ValueError(f"File not found at {response.url}: {response.content}")
+    else:
+        raise requests.RequestException(f"Unknown request error - code {response.status_code}"
+                                        f" from {response.url}: {response.content}")
 
 
 def get_file(url: str):
     response = requests.get(url)
+
+    if not response.ok:
+        handle_reponse_error(response)
+
     pdf_bytes_reader = io.BytesIO(response.content)
     return pypdf.PdfReader(pdf_bytes_reader)
 
