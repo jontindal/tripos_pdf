@@ -20,11 +20,11 @@ Optionally, each page can also be watermarked with its paper and year.
 Consult `tripos-pdf --help` for the full set of options.
 
 ```bash
-tripos-pdf 2P1_2000 2P2_2001
+tripos-pdf 1P1_2000 3A1_2021
 ```
 
 ### Without Console Script
 
 ```bash
-python -m tripos_pdf 2P1_2000 2P2_2001
+python -m tripos_pdf 1P1_2000 3A1_2021
 ```
