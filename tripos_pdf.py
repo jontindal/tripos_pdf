@@ -9,6 +9,9 @@ import pypdf
 import requests
 
 
+TRIPOS_PARTS = ["IA", "IB", "IIA", "IIB"]
+
+
 def parse_question_paper(paper_input: str) -> tuple[str, int, list[int] | None]:
     pages: list[int] | None = None
 
@@ -33,7 +36,10 @@ def parse_question_paper(paper_input: str) -> tuple[str, int, list[int] | None]:
 
 
 def get_download_url(paper: str, year: int) -> str:
-    return f"https://cribs-static.vercel.app/IB/tripos/{paper}/QP_{year}.pdf"
+    tripos_year = int(paper[0])
+    tripos_part = TRIPOS_PARTS[tripos_year - 1]
+    division = paper[1] + "/" if tripos_year > 2 else ""
+    return f"https://cribs-static.vercel.app/{tripos_part}/tripos/{division}{paper}/QP_{year}.pdf"
 
 
 def handle_reponse_error(response: requests.Response) -> t.NoReturn:
