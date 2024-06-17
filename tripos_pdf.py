@@ -76,7 +76,7 @@ def get_text_pdf(text: str) -> pypdf.PageObject:
     return pypdf.PdfReader(packet).get_page(0)
 
 
-def main() -> None:
+def main(argv: t.Sequence[str] | None = None) -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("question_papers", nargs="+", type=str,
                         help="Question papers in form <paper>_<year> with optional page number selections."
@@ -87,7 +87,7 @@ def main() -> None:
                         help="If set, will watermark each file with "
                         "the paper name and year in the top left corner")
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     output_pdf = pypdf.PdfWriter()
 
